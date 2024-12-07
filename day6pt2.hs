@@ -18,20 +18,21 @@ nextPos (x, y) DirRight = (x + 1, y)
 nextPos (x, y) DirDown = (x, y + 1)
 nextPos (x, y) DirLeft = (x - 1, y)
 
-isJailed obstacles (x, y) = (x + 1, y) `elem` obstacles && (x - 1, y) `elem` obstacles && (x, y - 1) `elem` obstacles && (x, y + 1) `elem` obstacles
-
 stepGuard :: HS.HashSet (Int, Int) -> (Int, Int) -> Direction -> ((Int, Int), Direction)
 stepGuard obstacles (x, y) direction
-    | nextPos (x, y) direction `HS.member` obstacles = stepGuard obstacles (x, y) (turnRight direction)
+    | nextPos (x, y) direction `HS.member` obstacles = ((x, y), turnRight direction)
     | otherwise = (nextPos (x, y) direction, direction)
 
-willLoop :: (Int, Int) -> (Int, Int) -> Direction -> HS.HashSet (Int, Int, Int) -> HS.HashSet (Int, Int) -> Bool
+willLoop :: (Int, Int) -> (Int, Int) -> Direction -> HS.HashSet (Int, Int) -> HS.HashSet (Int, Int) -> Bool
 willLoop (w, h) (x, y) direction visited obstacles
     | x < 0 || x >= w || y < 0 || y >= h = False
-    | (x, y, fromEnum direction) `HS.member` visited = True
     | otherwise =
-        let (newPos, newDir) = stepGuard obstacles (x, y) direction
-        in willLoop (w, h) newPos newDir (HS.insert (x, y, fromEnum direction) visited) obstacles
+        let (newPos, newDir) = stepGuard obstacles (x, y) direction in
+        let newVisited = if direction /= newDir && newDir == DirRight
+            then HS.insert newPos visited
+            else visited
+        in (direction /= newDir && newDir == DirRight && newPos `HS.member` visited)
+        || willLoop (w, h) newPos newDir newVisited obstacles
 
 
 collectPos (w, h) obstacles (x, y) direction
