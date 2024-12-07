@@ -1,24 +1,25 @@
 use rayon::{iter::ParallelIterator, str::ParallelString};
 
-fn concat(a: u64, b: u64) -> u64 {
-    a * (10_u64.pow(1 + b.ilog10())) + b
-}
-
-fn make_possibilities(remaining: &[u64], callback: &dyn Fn(u64) -> bool) -> bool{
-    if remaining.len() == 1 {
-        let item = remaining[0];
-        return callback(item);
-    }
-    let (&tail, head) = remaining.split_last().unwrap();
-    make_possibilities(head, &|e| {
-        callback(e * tail) ||
-        callback(e + tail) ||
-        callback(concat(e, tail))
-    })
-}
-
 fn is_okay((target, numbers): (u64, Vec<u64>)) -> Option<u64> {
-    if make_possibilities(&numbers, &|e| e == target) {
+    let (&first, rest) = numbers.split_first().unwrap();
+    let mut prev = vec![target];
+    for &item in rest.iter().rev() {
+        let mut cur = vec![];
+        for &val in prev.iter() {
+            if val % item == 0 {
+                cur.push(val / item);
+            }
+            if val > item {
+                cur.push(val - item);
+            }
+            let n = 10_u64.pow(1 + item.ilog10());
+            if val % n == item {
+                cur.push(val / n);
+            }
+        }
+        prev = cur;
+    }
+    if prev.contains(&first) {
         Some(target)
     } else {
         None
