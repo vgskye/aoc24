@@ -28,15 +28,14 @@ fn is_okay((target, numbers): (u64, Vec<u64>)) -> Option<u64> {
 
 fn parse_line(line: &str) -> (u64, Vec<u64>) {
     let (target, numbers) = line.split_once(": ").unwrap();
-    (target.parse().unwrap(), numbers.split(' ').map(|e| e.parse().unwrap()).collect())
+    (
+        target.parse().unwrap(),
+        numbers.split(' ').map(|e| e.parse().unwrap()).collect(),
+    )
 }
 
 fn main() {
     let file = std::fs::read_to_string("day7.txt").unwrap();
-    let answer: u64 = file
-        .par_lines()
-        .map(parse_line)
-        .filter_map(is_okay)
-        .sum();
+    let answer: u64 = file.par_lines().map(parse_line).filter_map(is_okay).sum();
     println!("{answer}");
 }
