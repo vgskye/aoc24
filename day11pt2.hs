@@ -2,25 +2,25 @@ import System.IO
 import Control.Monad
 import Data.List
 import Math.NumberTheory.Logarithms
-import Debug.Trace
-import Control.Parallel.Strategies (parMap, rpar)
 import Data.MemoTrie
+import Control.Parallel.Strategies (parMap, rpar)
+
+l10 = integerLog10' . toInteger
 
 blinked a
     | a == 0 = [1]
-    | odd (integerLog10' a) =
-        let log = (1 + integerLog10' a) `div` 2
+    | odd (l10 a) =
+        let log = (1 + l10 a) `div` 2
         in [a `div` (10 ^ log), a `mod` (10 ^ log)]
     | otherwise = [a * 2024]
 
-blinkcount _ (1, l) = (length . concatMap blinked) l
-blinkcount self (n, l) = (sum . parMap rpar ((\a -> self (n - 1, a)) . blinked)) l
+blinkcount 0 _ = 1
+blinkcount n i = (sum . parMap rpar (mblinkcount (n - 1)) . blinked) i
 
-mblinkcount :: Int -> [Integer] -> Int
-mblinkcount d l = memoFix blinkcount (d, l)
-
+mblinkcount :: Int -> Int -> Int
+mblinkcount = memo2 blinkcount
 main = do
         handle <- openFile "day11.txt" ReadMode
         answer <- fmap (map read . words) (hGetContents handle)
-        print (mblinkcount 75 answer)
+        print (sum (map (mblinkcount 75) answer))
         hClose handle
