@@ -4,6 +4,7 @@ import Data.List
 import Math.NumberTheory.Logarithms
 import Data.MemoTrie
 import Control.Parallel.Strategies (parMap, rpar)
+import Data.Int (Int64)
 
 l10 = integerLog10' . toInteger
 
@@ -17,7 +18,7 @@ blinked a
 blinkcount 0 _ = 1
 blinkcount n i = (sum . parMap rpar (mblinkcount (n - 1)) . blinked) i
 
-mblinkcount :: Int -> Int -> Int
+mblinkcount :: Int -> Int64 -> Int64
 mblinkcount = memo2 blinkcount
 main = do
         handle <- openFile "day11.txt" ReadMode
