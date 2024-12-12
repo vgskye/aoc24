@@ -1,8 +1,5 @@
 import System.IO
-import Control.Monad
 import Data.List
-import qualified Data.HashSet as HS
-import Debug.Trace
 import Data.Maybe
 main = do
         handle <- openFile "day12.txt" ReadMode
