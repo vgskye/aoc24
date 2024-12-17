@@ -31,7 +31,8 @@ runinsn 3 op (ProcessorState (a, b, c) pc) =
 runinsn 4 op (ProcessorState (a, b, c) pc) =
     return $ ProcessorState (a, b `xor` c, c) (pc + 2)
 runinsn 5 op (ProcessorState (a, b, c) pc) = do
-    print $ getCompound op (ProcessorState (a, b, c) pc) `mod` 8
+    putStr $ show $ getCompound op (ProcessorState (a, b, c) pc) `mod` 8
+    putChar ','
     return $ ProcessorState (a, b, c) (pc + 2)
 runinsn 6 op (ProcessorState (a, b, c) pc) =
     return $ ProcessorState (a, a `shiftR` getCompound op (ProcessorState (a, b, c) pc), c) (pc + 2)
