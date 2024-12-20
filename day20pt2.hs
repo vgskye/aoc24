@@ -43,8 +43,7 @@ djikstra w h walls visited tovisit
     | MQ.null tovisit = visited
     | otherwise = do
         let Just (QueueEntry dist pos, newTovisit) = MQ.minView tovisit
-        let (x, y) = pos
-        if (pos `HM.member` visited) || (x >= w) || (x < 0) || (y >= h) || (y < 0)
+        if pos `HM.member` visited
             then djikstra w h walls visited newTovisit
             else do
                 let newVisited = HM.insert pos dist visited
